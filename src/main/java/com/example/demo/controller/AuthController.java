@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -20,6 +21,25 @@ public class AuthController {
 
     AuthController(UserRepository userRepository) {
         this.userRepository = userRepository;
+    }
+
+    // ========== GET /api/auth/login ==========
+    // Kama mtu (au browser) akifungua /api/auth/login moja kwa moja (GET)
+    // badala ya kupata 405, tunamrudisha kwenye ukurasa halisi wa login.
+    @GetMapping("/login")
+    public ResponseEntity<Void> loginPage() {
+        return ResponseEntity.status(HttpStatus.FOUND)
+                .location(URI.create("/login.html"))
+                .build();
+    }
+
+    // ========== GET /api/auth/register ==========
+    // Vivyo hivyo kwa register: GET inaelekeza kwenye ukurasa wa register.html.
+    @GetMapping("/register")
+    public ResponseEntity<Void> registerPage() {
+        return ResponseEntity.status(HttpStatus.FOUND)
+                .location(URI.create("/register.html"))
+                .build();
     }
 
     // ========== REGISTER ==========
