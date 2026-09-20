@@ -164,11 +164,11 @@
 
     async function loadReports() {
         try {
-            let url = 'http://localhost:8080/api/reports';
+            let url = '/api/reports';
 
             // Student/Teacher wanaona reports zao tu
             if (user.role !== 'Supervisor') {
-                url = `http://localhost:8080/api/reports/user/${user.email}`;
+                url = `/api/reports/user/${user.email}`;
             }
 
             const response = await fetch(url);
@@ -230,7 +230,7 @@
         const remark = document.getElementById(`remark-${id}`).value.trim();
         if (!remark) return alert('Write a remark first');
 
-        await fetch(`http://localhost:8080/api/reports/${id}/remark`, {
+        await fetch(`/api/reports/${id}/remark`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(remark)
@@ -239,7 +239,7 @@
     }
 
     async function changeStatus(id, status) {
-        await fetch(`http://localhost:8080/api/reports/${id}/status`, {
+        await fetch(`/api/reports/${id}/status`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(status)
@@ -249,7 +249,7 @@
 
     async function deleteReport(id) {
         if (!confirm('Are you sure?')) return;
-        await fetch(`http://localhost:8080/api/reports/${id}`, {
+        await fetch(`/api/reports/${id}`, {
             method: 'DELETE'
         });
         loadReports();
