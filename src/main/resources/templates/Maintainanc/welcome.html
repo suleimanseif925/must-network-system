@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome - Must Network Maintenance</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background: #0f172a; color: #e2e8f0;margin: 0%; }
+       
+        .logo { color: #38bdf8; font-size: 20px; font-weight: bold; }
+        .user { color: #94a3b8; font-size: 14px; margin-left: 350px;}
+        .user button {
+            margin-left: 55px;
+            background: #334155;
+            color: white;
+            border: none;
+            padding: 7px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .hero {
+          
+            border: top 1px #0ea5e9;
+            padding: 250px 120px;
+            text-align: center;
+            border: 1px solid #111924;
+            background-image: url('1.jpg');
+            background-attachment: scroll;
+            background-size: cover;
+            background-repeat: no-repeat;
+            border-bottom: 0;
+            font-weight: bold;
+
+           
+        
+        }
+       
+        .hero h1 { color: #38bdf8; margin-bottom: 15px; }
+        .hero p { color: #c3cfdf; max-width: 520px; margin: 0 auto 30px; line-height: 1.6; font-size: larger;}
+        .buttons { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; }
+        .btn {
+            padding: 14px 28px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 15px;
+        }
+        .btn-primary { background: #0ea5e9; color: white; }
+        .btn-secondary { background: #334155; color: white; }
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #1e293b ;
+            color: #7a9bc9;
+            font-size: 14px;
+            border-top: 1px solid #1e293b;
+            border-radius: 10px;
+            
+        }
+         strong { color: #38bdf8; }
+        .color{
+        background-color: #1e293b ;
+        margin-top: 0px;
+        top: 0%;
+        padding: 30px 20px;
+        border-radius: 10px;
+        }
+        header {
+  
+ 
+   border-bottom:5px solid #1c94c4;
+   top: 0%;
+   position: sticky;
+  
+}
+  /* ===== STICKY NAVIGATION BAR ===== */
+nav {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: #1e293b;
+    border-bottom: 1px solid #334155;
+    padding: 20px 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    margin: 0%;
+}
+
+.nav-brand {
+    color: #38bdf8;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.nav-links a {
+    color: #e2e8f0;
+    text-decoration: none;
+    font-size: 14px;
+    padding: 7px 14px;
+    border-radius: 6px;
+    transition: 0.2s;
+}
+
+.nav-links a:hover {
+    background: #334155;
+    color: #38bdf8;
+}
+
+
+
+
+.user-info {
+    color: #94a3b8;
+    font-size: 13px;
+}
+
+.logout-btn {
+    background: #334155;
+    color: white;
+    border: none;
+    padding: 7px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.logout-btn:hover {
+    background: #475569;
+}     
+        
+    
+
+    </style>
+</head>
+<body>
+    <header>
+    <nav>
+    <div class="nav-brand">Must Network Maintenance</div>
+    <div class="nav-links">
+        <span class="user-info" id="userInfo"></span>
+        <a href="welcome.html" class="active">Home</a>
+        <a href="report.html">Report Problem</a>
+        <a href="reports.html">View Reports</a>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+</nav>
+    </header>
+    <div class="container">
+
+        <div class="hero">
+
+           
+            <h1>About the System</h1>
+            <p>
+                This system allows students and teachers to report network problems such as 
+                Router Failure, WiFi issues, and computers that cannot connect to the network. 
+                Supervisors can review and respond to the reports.
+            </p>
+            <div class="buttons">
+                <a href="report.html" class="btn btn-primary">Report Network Problem</a>
+                <a href="reports.html" class="btn btn-secondary">View Reports</a>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="color">
+        <p><strong>Supervisor Contacts:</strong></p>
+        <p>Supervisor 1: 0712 345 678 &nbsp;|&nbsp; Supervisor 2: 0755 123 456</p>
+        <p>Must Network Maintenance System © 2026</p>
+        </div>
+    </footer>
+
+    <script>
+        
+        const user = JSON.parse(localStorage.getItem('nm_currentUser'));
+        if (!user) {
+            window.location.href = 'login.html';
+        } else {
+            document.getElementById('userInfo').textContent = user.fullname + ' (' + user.role + ')';
+        }
+
+        function logout() {
+            localStorage.removeItem('nm_currentUser');
+            window.location.href = 'login.html';
+        }
+        
+    </script>
+</body>
+</html>

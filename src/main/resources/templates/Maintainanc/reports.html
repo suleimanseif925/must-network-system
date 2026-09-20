@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports - Must Network Maintenance</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background: #0f172a; color: #e2e8f0; min-height: 100vh; }
+
+        nav {
+            background: #1e293b;
+            border-bottom: 1px solid #334155;
+            padding: 14px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .nav-brand { color: #38bdf8; font-size: 18px; font-weight: bold; }
+        .nav-links { display: flex; align-items: center; gap: 12px; }
+        .nav-links a {
+            color: #e2e8f0;
+            text-decoration: none;
+            font-size: 14px;
+            padding: 7px 14px;
+            border-radius: 6px;
+        }
+        .nav-links a:hover { background: #334155; color: #38bdf8; }
+        .user-info { color: #94a3b8; font-size: 13px; }
+        .logout-btn {
+            background: #334155;
+            color: white;
+            border: none;
+            padding: 7px 14px;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .container { max-width: 1150px; margin: 30px auto; padding: 0 20px; }
+        h1 { color: #38bdf8; margin-bottom: 20px; }
+
+        .card {
+            background: #1e293b;
+            border-radius: 12px;
+            border: 1px solid #334155;
+            overflow-x: auto;
+        }
+        table { width: 100%; border-collapse: collapse; min-width: 950px; }
+        th {
+            background: #0f172a;
+            padding: 14px;
+            text-align: left;
+            color: #38bdf8;
+            font-size: 14px;
+        }
+        td {
+            padding: 14px;
+            border-top: 1px solid #334155;
+            font-size: 14px;
+            vertical-align: top;
+        }
+        .status {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .Pending { background: #f59e0b; color: #000; }
+        .InProgress { background: #3b82f6; color: white; }
+        .Resolved { background: #22c55e; color: #000; }
+        .empty { text-align: center; padding: 50px; color: #64748b; }
+
+        .action-btn {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-right: 5px;
+            margin-top: 5px;
+        }
+        .edit-btn { background: #0ea5e9; color: white; }
+        .delete-btn { background: #ef4444; color: white; }
+        .save-btn { background: #22c55e; color: white; }
+        .cancel-btn { background: #64748b; color: white; }
+        .status-btn { background: #3b82f6; color: white; }
+        .resolve-btn { background: #22c55e; color: white; }
+
+        .remark-box {
+            margin-top: 8px;
+        }
+        .remark-box input {
+            width: 100%;
+            padding: 7px;
+            border-radius: 5px;
+            border: 1px solid #475569;
+            background: #0f172a;
+            color: white;
+            margin-bottom: 6px;
+            font-size: 13px;
+        }
+
+        .edit-form input, .edit-form select, .edit-form textarea {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 8px;
+            border-radius: 6px;
+            border: 1px solid #475569;
+            background: #0f172a;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <div class="nav-brand">Must Network Maintenance</div>
+    <div class="nav-links">
+        <span class="user-info" id="userInfo"></span>
+        <a href="welcome.html">Home</a>
+        <a href="report.html" id="reportLink">Report Problem</a>
+        <a href="reports.html">View Reports</a>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+</nav>
+
+<div class="container">
+    <h1>Network Reports</h1>
+
+    <div class="card">
+        <table>
+            <thead>
+                <tr>
+                    <th>Type of Problem</th>
+                    <th>Location</th>
+                    <th>Reported By</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Actions / Remark</th>
+                </tr>
+            </thead>
+            <tbody id="reportsBody"></tbody>
+        </table>
+        <div id="empty" class="empty" style="display:none;">No reports yet.</div>
+    </div>
+</div>
+
+<script>
+    const user = JSON.parse(localStorage.getItem('nm_currentUser'));
+    if (!user) {
+        window.location.href = 'login.html';
+    }
+
+    document.getElementById('userInfo').textContent = user.fullname + ' (' + user.role + ')';
+
+    if (user.role === 'Supervisor') {
+        const reportLink = document.getElementById('reportLink');
+        if (reportLink) reportLink.style.display = 'none';
+    }
+
+    async function loadReports() {
+        try {
+            let url = 'http://localhost:8080/api/reports';
+
+            // Student/Teacher wanaona reports zao tu
+            if (user.role !== 'Supervisor') {
+                url = `http://localhost:8080/api/reports/user/${user.email}`;
+            }
+
+            const response = await fetch(url);
+            const reports = await response.json();
+            render(reports);
+        } catch (error) {
+            alert('Imeshindikana kupakia reports');
+        }
+    }
+
+    function render(reports) {
+        const tbody = document.getElementById('reportsBody');
+        const empty = document.getElementById('empty');
+
+        if (!reports || reports.length === 0) {
+            tbody.innerHTML = '';
+            empty.style.display = 'block';
+            return;
+        }
+
+        empty.style.display = 'none';
+
+        tbody.innerHTML = reports.map(r => {
+            const showEdit = (user.role !== 'Supervisor' && r.status === 'Pending');
+            const isSupervisor = user.role === 'Supervisor';
+
+            return `
+                <tr>
+                    <td>
+                        <strong>${r.problemType}</strong><br>
+                        <small style="color:#94a3b8">${r.priority} Priority</small><br>
+                        <small>${r.description}</small>
+                    </td>
+                    <td>${r.location}</td>
+                    <td>${r.reportedBy}<br><small>${r.role}</small></td>
+                    <td>${r.createdAt ? r.createdAt.substring(0,10) : '-'}</td>
+                    <td><span class="status ${r.status.replace(' ', '')}">${r.status}</span></td>
+                    <td>
+                        ${r.supervisorRemark ? `<div style="margin-bottom:8px"><strong>Remark:</strong> ${r.supervisorRemark}</div>` : ''}
+
+                        ${showEdit ? `<button class="action-btn edit-btn" onclick="editReport(${r.id})">Edit</button>` : ''}
+
+                        ${isSupervisor ? `
+                            <div class="remark-box">
+                                <input type="text" id="remark-${r.id}" placeholder="Write remark...">
+                                <button class="action-btn save-btn" onclick="addRemark(${r.id})">Save Remark</button>
+                                <button class="action-btn status-btn" onclick="changeStatus(${r.id}, 'In Progress')">In Progress</button>
+                                <button class="action-btn resolve-btn" onclick="changeStatus(${r.id}, 'Resolved')">Resolve</button>
+                                <button class="action-btn delete-btn" onclick="deleteReport(${r.id})">Delete</button>
+                            </div>
+                        ` : ''}
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    async function addRemark(id) {
+        const remark = document.getElementById(`remark-${id}`).value.trim();
+        if (!remark) return alert('Write a remark first');
+
+        await fetch(`http://localhost:8080/api/reports/${id}/remark`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(remark)
+        });
+        loadReports();
+    }
+
+    async function changeStatus(id, status) {
+        await fetch(`http://localhost:8080/api/reports/${id}/status`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(status)
+        });
+        loadReports();
+    }
+
+    async function deleteReport(id) {
+        if (!confirm('Are you sure?')) return;
+        await fetch(`http://localhost:8080/api/reports/${id}`, {
+            method: 'DELETE'
+        });
+        loadReports();
+    }
+
+    function logout() {
+        localStorage.removeItem('nm_currentUser');
+        window.location.href = 'login.html';
+    }
+
+    // Start
+    loadReports();
+</script>
+</body>
+</html>
